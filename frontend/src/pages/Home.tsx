@@ -61,7 +61,7 @@ export function Home() {
   const streakPill = useMemo(() => `Continue streak: ${progress.streak || 0} day${(progress.streak || 0) === 1 ? '' : 's'}`,[progress.streak])
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
+    <div className="layout-main">
       {/* Sidebar with search on top */}
       <aside className="space-y-3">
         <div className="card p-4">

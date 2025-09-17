@@ -28,7 +28,7 @@
   --fs-caption: clamp(0.75rem, 0.3vw + 0.65rem, 0.8125rem);
 
   /* Layout */
-  --container-max: 80rem; /* 1280px */
+  --container-max: 120rem; /* 1280px */
   --container-pad: clamp(1rem, 3vw, 2rem);
 
   /* Buttons */
@@ -96,3 +96,9 @@ body {
 .tab { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; padding:0.375rem 0.75rem; background-color:var(--color-surface); color:var(--color-text); border:1px solid rgba(0,0,0,0.12); font-size:var(--fs-small); }
 .tab-active { background-color:var(--color-accent-soft); color:var(--color-accent); border-color:rgba(124,58,237,0.3); }
 /* stylelint-enable at-rule-no-unknown */
+
+/* Layout helpers */
+.layout-main { display: grid; gap: 1.5rem; }
+@media (min-width: 768px) { /* md */
+  .layout-main { grid-template-columns: 320px 1fr; }
+}
