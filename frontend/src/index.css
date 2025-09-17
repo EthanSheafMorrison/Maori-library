@@ -1,0 +1,98 @@
+/* stylelint-disable at-rule-no-unknown */
+@import "tailwindcss";
+
+@theme {
+  /* Typography */
+  --font-sans: "Helvetica Neue", Arial;
+  --font-serif: "Georgia", "Times New Roman", serif;
+
+  /* Color palette — muted, editorial */
+  --color-background: #f7f7f5;   /* warm gray off-white */
+  --color-text: #111111;         /* deep black */
+  --color-muted: #555555;        /* for secondary text */
+  --color-accent: #7c3aed;       /* purple accent */
+  --color-accent-soft: #e9d5ff;  /* soft accent background */
+  --color-surface: #ffffff;
+  --color-highlight: #d1fae5;    /* soft mint highlight */
+
+  /* Radius & shadows */
+  --radius: 12px;
+  --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
+
+  /* Responsive typography scale */
+  --fs-1: clamp(2.25rem, 2.5vw + 1.2rem, 3rem);   /* h1 */
+  --fs-2: clamp(1.5rem, 1.6vw + 0.8rem, 2rem);    /* h2 */
+  --fs-3: clamp(1.125rem, 0.8vw + 0.7rem, 1.25rem); /* h3 */
+  --fs-body: clamp(1rem, 0.4vw + 0.9rem, 1.0625rem);
+  --fs-small: clamp(0.875rem, 0.35vw + 0.75rem, 0.9375rem);
+  --fs-caption: clamp(0.75rem, 0.3vw + 0.65rem, 0.8125rem);
+
+  /* Layout */
+  --container-max: 80rem; /* 1280px */
+  --container-pad: clamp(1rem, 3vw, 2rem);
+
+  /* Buttons */
+  --btn-px: 1rem;
+  --btn-py: 0.5rem;
+}
+
+/* App globals */
+html, body, #root {
+  height: 100%;
+}
+
+/* Base layout */
+body {
+  @apply bg-[color:var(--color-background)] text-[color:var(--color-text)] font-sans leading-relaxed;
+  font-size: var(--fs-body);
+}
+
+/*
+  Theming helpers — apply these classes to any container or element.
+  They use your tokens above so you can tweak once and reuse everywhere.
+*/
+
+/* App background options */
+.bg-app-default { @apply bg-[color:var(--color-background)]; }
+.bg-app-muted { @apply bg-[color:#f0f0ef]; }
+.bg-app-surface { @apply bg-[color:var(--color-surface)]; }
+.bg-app-dark { @apply bg-gray-900 text-gray-100; }
+
+/* Containers and sections */
+.container-app { max-width: var(--container-max); margin-left: auto; margin-right: auto; padding-left: var(--container-pad); padding-right: var(--container-pad); }
+.section { @apply py-6 md:py-8; }
+
+/* Card / section containers */
+.card { @apply rounded-[var(--radius)] bg-[color:var(--color-surface)] shadow-[var(--shadow-card)] p-8; }
+.surface-muted { @apply bg-[color:#f8fafc]; }
+
+/* Text helpers */
+.text-muted { @apply text-[color:var(--color-muted)]; }
+.text-accent { @apply text-[color:var(--color-accent)]; }
+.text-small { font-size: var(--fs-small); }
+.text-caption { font-size: var(--fs-caption); }
+
+/* Accent highlight blocks */
+.accent-box { @apply bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent)] font-semibold px-4 py-2 rounded-[var(--radius)]; }
+.highlight { @apply inline-flex items-center rounded-[var(--radius)] bg-[color:var(--color-highlight)] px-2.5 py-1 text-[color:var(--color-accent)]; }
+.pill {
+  @apply inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700;
+}
+
+/* Focus rings using brand */
+.ring-brand-focus { @apply focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)]/40 focus:ring-offset-2; }
+
+/* Headings — editorial large serif */
+.h1 { @apply font-bold tracking-tight; font-size: var(--fs-1); }
+.h2 { @apply font-semibold; font-size: var(--fs-2); }
+.h3 { @apply font-medium text-[color:var(--color-muted)]; font-size: var(--fs-3); }
+
+/* Gradient / vignette background */
+.gradient-bg { background: radial-gradient(circle at top left, var(--color-highlight), transparent 70%); }
+
+/* Muted divider lines */
+.divider { @apply border-t border-gray-200 my-8; }
+/* Tabs */
+.tab { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; padding:0.375rem 0.75rem; background-color:var(--color-surface); color:var(--color-text); border:1px solid rgba(0,0,0,0.12); font-size:var(--fs-small); }
+.tab-active { background-color:var(--color-accent-soft); color:var(--color-accent); border-color:rgba(124,58,237,0.3); }
+/* stylelint-enable at-rule-no-unknown */
