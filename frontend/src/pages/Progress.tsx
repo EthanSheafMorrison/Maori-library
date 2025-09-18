@@ -5,6 +5,10 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 export function Progress() {
   const { progress, accuracy, reset } = useProgress()
   const level = useMemo(() => Math.floor(progress.xp / 200) + 1, [progress.xp])
+  const levelTitle = useMemo(() => {
+    const map = ['Kākano', 'Akonga', 'Kaiako', 'Pouako', 'Tohunga']
+    return map[Math.min(map.length - 1, level - 1)]
+  }, [level])
   const levelProgress = useMemo(() => progress.xp % 200, [progress.xp])
   const weekData = useMemo(() => {
     const base = Array.isArray(progress.history) ? progress.history : []
@@ -48,7 +52,7 @@ export function Progress() {
 
           <div className="mt-6">
             <div className="flex items-center justify-between mb-2">
-              <div className="font-semibold">Level {level}</div>
+              <div className="font-semibold">Level {level}: {levelTitle}</div>
               <div className="text-sm text-gray-500">{levelProgress}/200 XP</div>
             </div>
             <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
@@ -77,6 +81,7 @@ export function Progress() {
           <div className="flex flex-wrap gap-3">
             <Badge unlocked={progress.streak >= 3} label="3-day streak" />
             <Badge unlocked={progress.streak >= 7} label="7-day streak" />
+            <Badge unlocked={progress.streak >= 30} label="Monthly streak" />
             <Badge unlocked={progress.totalAnswered >= 50} label="50 answers" />
             <Badge unlocked={progress.totalCorrect >= 50} label="50 correct" />
             <Badge unlocked={progress.xp >= 1000} label="1000 XP" />

@@ -11,7 +11,7 @@ export function Practice() {
   return (
     <div>
       <h1 className="h1 mb-4">Quick practice</h1>
-      <FlashcardPractice cards={cards} />
+      <FlashcardPractice cards={cards} lessonId="quick-practice" />
     </div>
   )
 }

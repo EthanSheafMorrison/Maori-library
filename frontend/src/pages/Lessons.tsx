@@ -37,9 +37,26 @@ export function Lessons() {
           <article key={lesson.id} className="card p-5">
             <h2 className="h2">{lesson.title}</h2>
             <p className="text-muted mb-3">{lesson.description}</p>
-            <p className="text-sm text-muted">{lesson.cards.length} cards</p>
+            <LessonProgressBar lessonId={lesson.id} total={lesson.cards.length} />
           </article>
         ))}
+      </div>
+    </div>
+  )
+}
+
+import { useProgress } from '../context/ProgressContext'
+
+function LessonProgressBar({ lessonId, total }: { lessonId: string; total: number }) {
+  const { progress } = useProgress()
+  const learned = progress.lessonProgress[lessonId]?.learned ?? 0
+  const displayTotal = progress.lessonProgress[lessonId]?.total || total
+  const pct = Math.min(100, Math.round((learned / Math.max(1, displayTotal)) * 100))
+  return (
+    <div className="mt-2">
+      <div className="text-caption text-muted mb-1">{learned}/{displayTotal} words learned</div>
+      <div className="h-2 w-full rounded-full bg-gray-200">
+        <div className="h-2 rounded-full bg-[color:var(--color-accent)]" style={{ width: `${pct}%` }} />
       </div>
     </div>
   )

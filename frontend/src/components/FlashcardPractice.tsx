@@ -5,7 +5,7 @@ import { useVocab } from '../context/VocabContext'
 
 export type Card = VocabCard
 
-export function FlashcardPractice({ cards }: { cards: Card[] }) {
+export function FlashcardPractice({ cards, lessonId }: { cards: Card[]; lessonId?: string }) {
   const { recordAnswer } = useProgress()
   const { isSaved, toggle } = useVocab()
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -28,7 +28,7 @@ export function FlashcardPractice({ cards }: { cards: Card[] }) {
   function handleAnswer(correct: boolean) {
     if (!current) return
     setAnswered(prev => [...prev, { id: current.id, correct }])
-    recordAnswer(correct)
+    recordAnswer(correct, current.id, lessonId)
     setIsRevealed(false)
     setCurrentIndex(i => i + 1)
   }

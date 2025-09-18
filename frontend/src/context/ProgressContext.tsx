@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 type DayStat = { date: string; answered: number; correct: number; xp: number }
+type LearnedMap = Record<string, number> // cardId -> consecutive correct count
+type LessonProgress = Record<string, { learned: number; total: number }>
 
 type ProgressState = {
   totalAnswered: number
@@ -10,12 +12,14 @@ type ProgressState = {
   streak: number
   lastActiveDate: string | null
   history: DayStat[]
+  learnedByCard: LearnedMap
+  lessonProgress: LessonProgress
 }
 
 type ProgressContextValue = {
   progress: ProgressState
   accuracy: number
-  recordAnswer: (correct: boolean) => void
+  recordAnswer: (correct: boolean, cardId?: string, lessonId?: string) => void
   reset: () => void
 }
 
@@ -27,6 +31,8 @@ const defaultState: ProgressState = {
   streak: 0,
   lastActiveDate: null,
   history: [],
+  learnedByCard: {},
+  lessonProgress: {},
 }
 
 const ProgressContext = createContext<ProgressContextValue | undefined>(undefined)
@@ -46,6 +52,8 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         streak: typeof parsed.streak === 'number' ? parsed.streak : 0,
         lastActiveDate: typeof parsed.lastActiveDate === 'string' ? parsed.lastActiveDate : null,
         history: Array.isArray(parsed.history) ? parsed.history : [],
+        learnedByCard: parsed && typeof parsed === 'object' && parsed['learnedByCard'] && typeof parsed['learnedByCard'] === 'object' ? (parsed['learnedByCard'] as LearnedMap) : {},
+        lessonProgress: parsed && typeof parsed === 'object' && parsed['lessonProgress'] && typeof parsed['lessonProgress'] === 'object' ? (parsed['lessonProgress'] as LessonProgress) : {},
       }
     } catch {
       return defaultState
@@ -65,7 +73,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     return Math.round((progress.totalCorrect / progress.totalAnswered) * 100)
   }, [progress])
 
-  function recordAnswer(correct: boolean) {
+  function recordAnswer(correct: boolean, cardId?: string, lessonId?: string) {
     setProgress(prev => {
       const now = new Date()
       const today = now.toISOString().slice(0, 10)
@@ -103,6 +111,29 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         history.push({ date: today, answered: 1, correct: correct ? 1 : 0, xp: gained })
       }
 
+      // Learned tracking
+      const learnedByCard: LearnedMap = { ...prev.learnedByCard }
+      if (cardId) {
+        const current = learnedByCard[cardId] || 0
+        learnedByCard[cardId] = correct ? Math.min(current + 1, 3) : 0
+      }
+
+      // Lesson progress aggregation (consider learned when streak >= 2)
+      const lessonProgress: LessonProgress = { ...prev.lessonProgress }
+      if (lessonId && cardId) {
+        const entry = lessonProgress[lessonId] || { learned: 0, total: 0 }
+        // total increases only first time we see the card for that lesson in this map
+        if (!prev.lessonProgress[lessonId] || prev.lessonProgress[lessonId]!.total === entry.total) {
+          // We'll approximate total by counting unique cards encountered; caller should keep stable ids
+          entry.total = Math.max(entry.total, (entry.total || 0) + (learnedByCard[cardId] === (correct ? 1 : 0) ? 1 : 0))
+        }
+        const wasLearned = (prev.learnedByCard[cardId] || 0) >= 2
+        const isLearned = (learnedByCard[cardId] || 0) >= 2
+        if (!wasLearned && isLearned) entry.learned = Math.max(0, entry.learned + 1)
+        if (wasLearned && !isLearned) entry.learned = Math.max(0, entry.learned - 1)
+        lessonProgress[lessonId] = entry
+      }
+
       return {
         totalAnswered: prev.totalAnswered + 1,
         totalCorrect: prev.totalCorrect + (correct ? 1 : 0),
@@ -111,6 +142,8 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         streak,
         lastActiveDate: today,
         history,
+        learnedByCard,
+        lessonProgress,
       }
     })
   }
