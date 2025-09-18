@@ -7,10 +7,10 @@
   --font-serif: "Georgia", "Times New Roman", serif;
 
   /* Color palette — muted, editorial */
-  --color-background: #f7f7f5;   /* warm gray off-white */
+  --color-background: #f0eeeb;   /* warm gray off-white */
   --color-text: #111111;         /* deep black */
   --color-muted: #555555;        /* for secondary text */
-  --color-accent: #f5875f;       /* purple accent */
+  --color-accent: #f0624d;       /* purple accent */
   --color-accent-soft: #f5dcd3;  /* soft accent background */
   --color-surface: #ffffff;
   --color-highlight: #d1fae5;    /* soft mint highlight */
@@ -94,7 +94,7 @@ body {
 .divider { @apply border-t border-gray-200 my-8; }
 /* Tabs */
 .tab { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; padding:0.375rem 0.75rem; background-color:var(--color-surface); color:var(--color-text); border:1px solid rgba(0,0,0,0.12); font-size:var(--fs-small); }
-.tab-active { background-color:var(--color-accent-soft); color:var(--color-accent); border-color:rgba(124,58,237,0.3); }
+.tab-active { background-color:var(--color-accent-soft); color:var(--color-accent); border-color:var(--color-accent); }
 /* stylelint-enable at-rule-no-unknown */
 
 /* Layout helpers */
