@@ -109,7 +109,7 @@ export function Home() {
 
       {/* Main column */}
       <section className="space-y-4">
-        <div className="card p-3 flex flex-wrap items-center gap-3 justify-between">
+          <div className="card p-3 flex flex-wrap items-center gap-3 justify-between">
           <div className="flex items-center gap-2 text-small">
             <span className="pill">
               <Flame level={progress.streak || 0} />
@@ -119,33 +119,66 @@ export function Home() {
               <span className="accent-box">Don’t lose your streak today</span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <button className="btn-secondary text-small" onClick={() => setShowFilters(s => !s)}>Filter</button>
-            <button className="btn-secondary text-small" onClick={() => navigate('/my-queues')}>My queues</button>
-          </div>
+            <div className="flex items-center gap-2">
+              <button className="btn-secondary text-small" onClick={() => setShowFilters(s => !s)}>
+                Filter
+                {(selectedPlaylistId || hasTranscript || minFamiliarity > 0) && (
+                  <span className="meta-pill ml-2">{[selectedPlaylistId && 'Playlist', hasTranscript && 'Transcript', minFamiliarity > 0 && `≥ ${minFamiliarity}%`].filter(Boolean).length}</span>
+                )}
+              </button>
+              <button className="btn-secondary text-small" onClick={() => navigate('/my-queues')}>My queues</button>
+            </div>
         </div>
 
         {showFilters && (
-          <div className="card p-4 space-y-4">
+          <div className="card p-4 space-y-4 anim-scale-in">
             <div className="grid gap-3 sm:grid-cols-3">
-              <label className="text-small">
+              <label className="form-field">
                 <div className="text-muted mb-1">Playlist</div>
-                <select className="w-full border rounded px-3 py-2" value={selectedPlaylistId} onChange={e => setSelectedPlaylistId(e.target.value)}>
+                <select className="select w-full" value={selectedPlaylistId} onChange={e => setSelectedPlaylistId(e.target.value)}>
                   <option value="">All</option>
                   {playlists.map(p => (
                     <option key={p.id} value={p.id}>{p.title}</option>
                   ))}
                 </select>
               </label>
-              <label className="text-small flex items-end gap-2">
-                <input type="checkbox" className="scale-110" checked={hasTranscript} onChange={e => setHasTranscript(e.target.checked)} />
+              <label className="form-field flex items-end gap-2">
+                <input type="checkbox" className="checkbox" checked={hasTranscript} onChange={e => setHasTranscript(e.target.checked)} />
                 <span>Has transcript</span>
               </label>
-              <label className="text-small">
+              <label className="form-field">
                 <div className="text-muted mb-1">Min familiarity: {minFamiliarity}%</div>
-                <input type="range" min={0} max={100} step={5} value={minFamiliarity} onChange={e => setMinFamiliarity(Number(e.target.value))} className="w-full" />
+                <input type="range" min={0} max={100} step={5} value={minFamiliarity} onChange={e => setMinFamiliarity(Number(e.target.value))} className="range" />
               </label>
             </div>
+            {(selectedPlaylistId || hasTranscript || minFamiliarity > 0) && (
+              <div className="flex flex-wrap items-center gap-2">
+                {selectedPlaylistId && (
+                  <span className="chip chip-active">
+                    Playlist
+                    <button aria-label="Clear playlist" onClick={() => setSelectedPlaylistId('')}>
+                      ×
+                    </button>
+                  </span>
+                )}
+                {hasTranscript && (
+                  <span className="chip chip-active">
+                    Transcript
+                    <button aria-label="Clear transcript" onClick={() => setHasTranscript(false)}>
+                      ×
+                    </button>
+                  </span>
+                )}
+                {minFamiliarity > 0 && (
+                  <span className="chip chip-active">
+                    ≥ {minFamiliarity}%
+                    <button aria-label="Clear familiarity" onClick={() => setMinFamiliarity(0)}>
+                      ×
+                    </button>
+                  </span>
+                )}
+              </div>
+            )}
             <div className="flex justify-end gap-2">
               <button className="btn-secondary text-small" onClick={() => { setSelectedPlaylistId(''); setHasTranscript(false); setMinFamiliarity(0) }}>Clear</button>
               <button className="btn-primary text-small" onClick={() => setShowFilters(false)}>Done</button>
