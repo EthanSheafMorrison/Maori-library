@@ -1,5 +1,9 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
+import { media } from '../data/media'
+import { useVocab } from '../context/VocabContext'
+import type { VocabCard } from '../types'
 
 type TranscriptItem = { s: number; t: string; text: string }
 
@@ -23,6 +27,23 @@ export function VideoPlayer() {
   const { state } = useLocation() as { state: WatchState }
   const videoRef = useRef<HTMLVideoElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
+  const { savedList, save, unsave } = useVocab()
+  const [meaningByWord, setMeaningByWord] = useState<Record<string, string>>({})
+  const [openTipKey, setOpenTipKey] = useState<string | null>(null)
+
+  const currentMedia = useMemo(() => {
+    const mediaId = state?.item?.id ?? id ?? '1'
+    return media.find(m => m.id === mediaId)
+  }, [id, state])
+
+  const vocabByLowerFront = useMemo(() => {
+    const lookup = new Map<string, VocabCard>()
+    const cards = currentMedia?.cards ?? []
+    for (const c of cards) {
+      lookup.set(c.front.toLocaleLowerCase(), c)
+    }
+    return lookup
+  }, [currentMedia])
 
   const activeIdx = useMemo(() => {
     let idx = 0
@@ -34,8 +55,10 @@ export function VideoPlayer() {
   }, [currentTime])
 
   const meta = useMemo(() => {
-    return state?.item ?? { id: id ?? '1', title: 'Kōrero hauora: te whare tapa whā i te mahi', duration: '3:45' }
-  }, [id, state])
+    const fallback = { id: id ?? '1', title: 'Kōrero hauora: te whare tapa whā i te mahi', duration: '3:45' }
+    if (currentMedia) return { id: currentMedia.id, title: currentMedia.title, duration: currentMedia.duration }
+    return state?.item ?? fallback
+  }, [currentMedia, id, state])
 
   useEffect(() => {
     const el = document.getElementById(`ts-${activeIdx}`)
@@ -46,6 +69,89 @@ export function VideoPlayer() {
     const m = Math.floor(sec / 60)
     const s = Math.floor(sec % 60).toString().padStart(2, '0')
     return `${m}:${s}`
+  }
+
+  function renderTranscriptText(text: string) {
+    // Match unicode words, including macrons and apostrophes/hyphens
+    const wordRegex = /\p{L}[\p{L}\-’']*/gu
+    const nodes: ReactNode[] = []
+    let lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = wordRegex.exec(text)) !== null) {
+      const found = match[0]
+      const start = match.index
+      if (lastIndex < start) nodes.push(text.slice(lastIndex, start))
+
+      const lower = found.toLocaleLowerCase()
+      const mediaCard = vocabByLowerFront.get(lower)
+      const savedCard = savedList.find(c => c.front.toLocaleLowerCase() === lower)
+      const cardToShow = savedCard ?? mediaCard
+      const meaningValue = meaningByWord[lower] ?? ''
+
+      const tipKey = `${start}-${found}`
+      nodes.push(
+        <span key={tipKey} className="relative inline-flex items-center">
+          <button
+            type="button"
+            className={cardToShow ? 'highlight' : 'underline decoration-dotted cursor-pointer'}
+            aria-haspopup="dialog"
+            aria-expanded={openTipKey === tipKey}
+            onClick={(e) => { e.stopPropagation(); setOpenTipKey(prev => prev === tipKey ? null : tipKey) }}
+          >
+            {found}
+          </button>
+          <span
+            className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 bottom-full mb-2 ${openTipKey === tipKey ? 'block' : 'hidden'} whitespace-nowrap rounded-md border bg-white px-3 py-2 text-caption text-gray-700 shadow-md anim-fade-in z-10`}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="font-medium text-gray-900">{cardToShow?.front ?? found}</span>
+            {cardToShow?.back && <span className="mx-1 text-gray-300">•</span>}
+            {cardToShow?.back && <span>{cardToShow.back}</span>}
+            {savedCard ? (
+              <button
+                className="pointer-events-auto btn-secondary !py-1 !px-2 !text-caption ml-2"
+                onClick={(e) => { e.stopPropagation(); unsave(savedCard.id) }}
+              >
+                Remove
+              </button>
+            ) : mediaCard ? (
+              <button
+                className="pointer-events-auto btn-secondary !py-1 !px-2 !text-caption ml-2"
+                onClick={(e) => { e.stopPropagation(); save(mediaCard) }}
+              >
+                Save
+              </button>
+            ) : (
+              <span className="ml-2 inline-flex items-center gap-2">
+                <input
+                  className="pointer-events-auto border rounded px-2 py-1 text-caption"
+                  placeholder="meaning"
+                  value={meaningValue}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => setMeaningByWord(prev => ({ ...prev, [lower]: e.target.value }))}
+                />
+                <button
+                  className="pointer-events-auto btn-secondary !py-1 !px-2 !text-caption"
+                  disabled={!meaningValue.trim()}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const newCard: VocabCard = { id: lower, front: found, back: meaningValue.trim() }
+                    save(newCard)
+                  }}
+                >
+                  Save
+                </button>
+              </span>
+            )}
+          </span>
+        </span>
+      )
+
+      lastIndex = wordRegex.lastIndex
+    }
+    if (lastIndex < text.length) nodes.push(text.slice(lastIndex))
+    return nodes
   }
 
   return (
@@ -99,7 +205,7 @@ export function VideoPlayer() {
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-caption text-muted shrink-0">{row.t || formatTime(row.s)}</span>
-                    <span className="text-small">{row.text}</span>
+                    <span className="text-small">{renderTranscriptText(row.text)}</span>
                   </div>
                 </button>
               )
