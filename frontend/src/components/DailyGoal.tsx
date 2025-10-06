@@ -16,7 +16,6 @@ export function DailyGoal() {
   const goalSec = progress.goalMinutes * 60
   const clamped = Math.min(progress.watchedTodaySec, goalSec)
   const pct = Math.min(100, Math.round((clamped / goalSec) * 100))
-  const remain = Math.max(0, goalSec - progress.watchedTodaySec)
 
   const presets = useMemo(() => [
     { label: 'Casual', minutes: 15, help: 'Keeping your skills fresh' },
