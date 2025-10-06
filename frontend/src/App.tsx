@@ -11,8 +11,11 @@ import { QueueProvider } from './context/QueueContext'
 import { MyVocab } from './pages/MyVocab'
 import { VideoPlayer } from './pages/VideoPlayer'
 import { Playlist } from './pages/Playlist'
+import { Series } from './pages/Series'
+import { Library } from './pages/Library'
 import { MyQueues } from './pages/MyQueues'
 import { RecentlyAdded } from './pages/RecentlyAdded'
+import { Method } from './pages/Method'
 
 function App() {
   return (
@@ -27,9 +30,12 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/lessons" element={<Lessons />} />
                 <Route path="/practice" element={<Practice />} />
+                <Route path="/series" element={<Series />} />
+                <Route path="/library" element={<Library />} />
                 <Route path="/my-vocab" element={<MyVocab />} />
                 <Route path="/my-queues" element={<MyQueues />} />
                 <Route path="/progress" element={<Progress />} />
+                <Route path="/method" element={<Method />} />
                 <Route path="/watch/:id" element={<VideoPlayer />} />
                 <Route path="/playlist/:id" element={<Playlist />} />
                 <Route path="/recent" element={<RecentlyAdded />} />

@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useVocab } from '../context/VocabContext'
 import { useQueue } from '../context/QueueContext'
+// Daily goal button moved to Home toolbar
 
 export function NavBar() {
   const { savedList } = useVocab()
@@ -15,7 +16,7 @@ export function NavBar() {
       <div className="container-app py-4">
         <div className="flex items-center justify-between rounded-full bg-[color:var(--color-accent)] px-4 py-2 shadow-[var(--shadow-card)]">
           <NavLink to="/" className="h3 font-bold text-[color:var(--color-surface)]">
-            Kotahi
+            Tokotoko
           </NavLink>
           <nav className="flex items-center gap-6">
             <NavLink to="/lessons" className={linkClass}>
@@ -23,6 +24,9 @@ export function NavBar() {
             </NavLink>
             <NavLink to="/practice" className={linkClass}>
               Practice
+            </NavLink>
+            <NavLink to="/method" className={linkClass}>
+              Method
             </NavLink>
             <NavLink to="/my-vocab" className={linkClass}>
               My Vocab{savedList.length ? ` (${savedList.length})` : ''}

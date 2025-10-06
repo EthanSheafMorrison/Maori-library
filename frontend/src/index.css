@@ -30,6 +30,8 @@
   /* Layout */
   --container-max: 120rem; /* 1280px */
   --container-pad: clamp(1rem, 3vw, 2rem);
+  --sidebar-w: 320px; /* sidebar column width on md+ */
+  --layout-gap: 1.5rem; /* gap between sidebar and main */
 
   /* Buttons */
   --btn-px: 1rem;
@@ -39,6 +41,10 @@
 /* App globals */
 html, body, #root {
   height: 100%;
+}
+/* Prevent site-wide horizontal scroll; allow local containers to scroll */
+html, body {
+  overflow-x: hidden;
 }
 
 /* Base layout */
@@ -98,10 +104,52 @@ body {
 /* stylelint-enable at-rule-no-unknown */
 
 /* Layout helpers */
-.layout-main { display: grid; gap: 1.5rem; }
+.layout-main { display: grid; gap: var(--layout-gap); }
+/* Allow grid children to shrink so they don't force page overflow */
+.layout-main > * { min-width: 0; }
 @media (min-width: 768px) { /* md */
-  .layout-main { grid-template-columns: 320px 1fr; }
+  .layout-main { grid-template-columns: var(--sidebar-w) 1fr; }
 }
+@media (max-width: 767px) {
+  /* Sidebar stacks above content; treat content as full width */
+  :root { --sidebar-w: 0px; --layout-gap: 1rem; }
+}
+
+/* Horizontal rows */
+.row-container { width: 100%; max-width: calc(var(--container-max) - var(--sidebar-w) - var(--layout-gap)); margin-left: auto; margin-right: auto; }
+.row-scroll {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: calc(var(--container-max) - var(--sidebar-w) - var(--layout-gap)); /* match NAV minus sidebar */
+  margin-left: auto; margin-right: auto;
+  min-width: 0; /* prevent container from expanding page width */
+  overflow-x: auto;
+  box-sizing: border-box;
+  scrollbar-gutter: stable both-edges;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.5rem;
+}
+.row-item {
+  scroll-snap-align: start;
+  flex: 0 0 calc((100% - 5rem) / 6); /* 6 visible with 1rem gaps */
+  min-width: 300px;
+  max-width: 350px; /* avoid cutting content and keep controls close */
+}
+.row-arrows { gap: 0.25rem; }
+.row-arrow {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 9999px;
+  background: var(--color-surface); border: 1px solid rgba(0,0,0,0.12);
+}
+.row-arrow:hover { background-color: #f9fafb; }
+
+/* Hero featured */
+.hero { position: relative; overflow: hidden; border-radius: var(--radius); min-height: 240px; }
+.hero-media { position: absolute; inset: 0; background: linear-gradient(120deg, #cbd5e1, #f1f5f9); }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient( to top right, rgba(0,0,0,0.55), rgba(0,0,0,0.15) 60%, rgba(0,0,0,0)); }
+.hero-content { position: relative; z-index: 1; padding: 1.25rem; color: white; }
 
 /* Flame animation */
 .flame-svg { animation: floatY 3s ease-in-out infinite; }
@@ -163,3 +211,26 @@ body {
 .collapse-wrap.closed { grid-template-rows: 0fr; padding-top: 0; padding-bottom: 0; opacity: 0; }
 .collapse-wrap.open { grid-template-rows: 1fr; opacity: 1; }
 .collapse-inner { min-height: 0; }
+
+/* Sticky toolbar above hero */
+.toolbar-sticky {
+  position: sticky;
+  top: 0; /* stick to top of viewport */
+  z-index: 20; /* above hero image */
+  background: var(--color-background);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+/* Sticky sidebar menu */
+.sidebar-sticky { position: sticky; top: 1rem; }
+
+/* Small circular icon helpers */
+.icon-circle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 9999px;
+  background: var(--color-surface); border: 1px solid rgba(0,0,0,0.12);
+  color: var(--color-text);
+}
+.icon-circle.accent { background: var(--color-accent-soft); color: var(--color-accent); border-color: var(--color-accent); }
+.icon-circle.muted { background: #f6f7f8; color: var(--color-muted); }

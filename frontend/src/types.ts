@@ -22,6 +22,8 @@ export type MediaItem = {
   tags?: string[]
   addedAt?: string // ISO date string for sorting by recency
   hasTranscript?: boolean
+  thumbnailUrl?: string
+  heroUrl?: string
 }
 
 

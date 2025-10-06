@@ -12,14 +12,18 @@ export function MediaCard({ item }: { item: MediaItem }) {
   const queued = isQueued(item.id)
 
   return (
-    <article className="card overflow-hidden">
-      <div className="relative aspect-video bg-gray-100 flex items-center justify-center">
-        <div className="text-gray-400">▶</div>
+    <article className="card overflow-hidden flex flex-col h-[360px] sm:h-[380px]">
+      <div className="relative h-[180px] sm:h-[200px] bg-gray-100">
+        {item.thumbnailUrl ? (
+          <img src={item.thumbnailUrl} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-gray-400">▶</div>
+        )}
         <div className="absolute top-2 right-2">
           <FamiliarityBadge value={item.familiarity} size={42} />
         </div>
       </div>
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-3 flex-1 flex flex-col">
         <div className="flex items-center justify-between gap-3">
           <h3 className="font-medium text-gray-900 line-clamp-2" style={{ fontSize: 'var(--fs-3)' }}>{item.title}</h3>
           <span className="text-muted text-caption">{item.duration}</span>
@@ -29,7 +33,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
             <span>Transcript</span>
           </div>
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-auto">
           <button className="btn-primary flex-1" onClick={() => navigate(`/watch/${item.id}`, { state: { item } })}>Play</button>
           <button className="btn-secondary" onClick={() => toggleQueue(item.id)}>
             {queued ? 'Queued' : 'Queue'}

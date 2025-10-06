@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { media } from '../data/media'
 import { useVocab } from '../context/VocabContext'
 import type { VocabCard } from '../types'
+import { useProgress } from '../context/ProgressContext'
 
 type TranscriptItem = { s: number; t: string; text: string }
 
@@ -28,6 +29,7 @@ export function VideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const { savedList, save, unsave } = useVocab()
+  const { recordWatch } = useProgress()
   const [meaningByWord, setMeaningByWord] = useState<Record<string, string>>({})
   const [openTipKey, setOpenTipKey] = useState<string | null>(null)
 
@@ -64,6 +66,45 @@ export function VideoPlayer() {
     const el = document.getElementById(`ts-${activeIdx}`)
     el?.scrollIntoView({ block: 'nearest' })
   }, [activeIdx])
+
+  // Track watch time while the video plays
+  useEffect(() => {
+    const el = videoRef.current
+    if (!el) return
+    let lastTime = 0
+    let raf: number | null = null
+    let playing = false
+
+    function onPlay() {
+      playing = true
+      lastTime = (videoRef.current as HTMLVideoElement).currentTime
+      tick()
+    }
+    function onPause() {
+      playing = false
+      if (raf) cancelAnimationFrame(raf)
+    }
+    function tick() {
+      if (!playing) return
+      const now = (videoRef.current as HTMLVideoElement).currentTime
+      const delta = Math.max(0, now - lastTime)
+      if (delta >= 1) {
+        recordWatch(delta)
+        lastTime = now
+      }
+      raf = requestAnimationFrame(tick)
+    }
+
+    el.addEventListener('play', onPlay)
+    el.addEventListener('pause', onPause)
+    el.addEventListener('ended', onPause)
+    return () => {
+      el.removeEventListener('play', onPlay)
+      el.removeEventListener('pause', onPause)
+      el.removeEventListener('ended', onPause)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [recordWatch])
 
   function formatTime(sec: number) {
     const m = Math.floor(sec / 60)
