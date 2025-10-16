@@ -1,5 +1,5 @@
 import { Flame } from './Flame'
-import { DailyGoal } from './DailyGoal'
+// import { DailyGoal } from './DailyGoal'
 import { useProgress } from '../context/ProgressContext'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -21,7 +21,7 @@ export function TopToolbar({ onToggleFilters, activeFiltersCount = 0 }: TopToolb
           <Flame level={progress.streak || 0} />
           {streakPill}
         </span>
-        <DailyGoal />
+        {/* Daily goal hidden */}
         {progress.lastActiveDate !== new Date().toISOString().slice(0,10) && (
           <span className="accent-box">Don’t lose your streak today</span>
         )}

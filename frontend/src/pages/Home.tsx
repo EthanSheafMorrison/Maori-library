@@ -3,7 +3,7 @@ import { useProgress } from '../context/ProgressContext'
 import { HorizontalRow } from '../components/HorizontalRow'
 import { HeroFeatured } from '../components/HeroFeatured'
 import { Flame } from '../components/Flame'
-import { DailyGoal } from '../components/DailyGoal'
+// import { DailyGoal } from '../components/DailyGoal'
 import type { MediaItem } from '../types'
 import { media, playlists } from '../data/media'
 import { useNavigate } from 'react-router-dom'
@@ -106,7 +106,7 @@ export function Home() {
               <Flame level={progress.streak || 0} />
               {streakPill}
             </span>
-            <DailyGoal />
+            {/* Daily goal hidden */}
             {progress.lastActiveDate !== new Date().toISOString().slice(0,10) && (
               <span className="accent-box">Don’t lose your streak today</span>
             )}

@@ -1,4 +1,3 @@
-import { FamiliarityBadge } from './FamiliarityBadge'
 import { useVocab } from '../context/VocabContext'
 import type { MediaItem } from '../types'
 import { useNavigate } from 'react-router-dom'
@@ -19,9 +18,6 @@ export function MediaCard({ item }: { item: MediaItem }) {
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400">▶</div>
         )}
-        <div className="absolute top-2 right-2">
-          <FamiliarityBadge value={item.familiarity} size={42} />
-        </div>
       </div>
       <div className="p-4 space-y-3 flex-1 flex flex-col">
         <div className="flex items-center justify-between gap-3">
